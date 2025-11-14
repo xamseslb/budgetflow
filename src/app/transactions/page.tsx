@@ -1,46 +1,108 @@
+"use client"
+
+import { useState } from "react"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { AddTransactionDialog } from "@/components/add-transaction-dialog"
+
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 
 export default function TransactionsPage() {
+    const [filter, setFilter] = useState("all")
+
     const transactions = [
-        { id: 1, name: "Dagligvare: Rema 1000", amount: -350, date: "12.11.2024" },
-        { id: 2, name: "Lønn", amount: 22500, date: "01.11.2024" },
-        { id: 3, name: "Spotify", amount: -109, date: "05.11.2024" },
+        { title: "Dagligvare", amount: -350, date: "14. nov", category: "Mat" },
+        { title: "Lønn", amount: 21500, date: "10. nov", category: "Inntekt" },
+        { title: "Netflix", amount: -129, date: "09. nov", category: "Abonnement" },
+        { title: "Transport", amount: -420, date: "07. nov", category: "Reise" },
     ]
 
+    const filtered =
+        filter === "all"
+            ? transactions
+            : transactions.filter((t) => t.category === filter)
+
     return (
-        <div>
-            <div className="flex justify-between items-center mb-6">
+        <div className="space-y-6">
+            <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold">Transaksjoner</h1>
-                <Button>Ny transaksjon</Button>
+                <AddTransactionDialog />
+
             </div>
 
-            <div className="border rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
-                    <thead className="bg-muted">
-                    <tr>
-                        <th className="text-left p-3">Beskrivelse</th>
-                        <th className="text-left p-3">Dato</th>
-                        <th className="text-left p-3">Beløp</th>
-                    </tr>
-                    </thead>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Filter</CardTitle>
+                </CardHeader>
+                <CardContent className="flex gap-4">
+                    <Select onValueChange={(v) => setFilter(v)} defaultValue="all">
+                        <SelectTrigger className="w-[200px]">
+                            <SelectValue placeholder="Velg kategori" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Alle kategorier</SelectItem>
+                            <SelectItem value="Mat">Mat</SelectItem>
+                            <SelectItem value="Inntekt">Inntekt</SelectItem>
+                            <SelectItem value="Abonnement">Abonnement</SelectItem>
+                            <SelectItem value="Reise">Reise</SelectItem>
+                        </SelectContent>
+                    </Select>
 
-                    <tbody>
-                    {transactions.map((t) => (
-                        <tr key={t.id} className="border-t">
-                            <td className="p-3">{t.name}</td>
-                            <td className="p-3">{t.date}</td>
-                            <td
-                                className={`p-3 font-semibold ${
-                                    t.amount < 0 ? "text-red-500" : "text-green-600"
-                                }`}
-                            >
-                                {t.amount} kr
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
+                    <Input
+                        placeholder="Søk etter transaksjon..."
+                        className="max-w-sm"
+                    />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Alle transaksjoner</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Navn</TableHead>
+                                <TableHead>Dato</TableHead>
+                                <TableHead>Kategori</TableHead>
+                                <TableHead className="text-right">Beløp</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {filtered.map((t, i) => (
+                                <TableRow key={i}>
+                                    <TableCell>{t.title}</TableCell>
+                                    <TableCell>{t.date}</TableCell>
+                                    <TableCell>{t.category}</TableCell>
+                                    <TableCell
+                                        className={`text-right ${
+                                            t.amount < 0 ? "text-red-500" : "text-green-600"
+                                        }`}
+                                    >
+                                        {t.amount} kr
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         </div>
     )
 }
